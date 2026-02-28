@@ -1,0 +1,106 @@
+﻿<Window x:Class="LibraryManagement.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:LibraryManagement.ViewModels"
+        mc:Ignorable="d"
+        Title="Управление библиотекой" Height="600" Width="900"
+        WindowStartupLocation="CenterScreen">
+
+    <Window.DataContext>
+        <local:MainViewModel />
+    </Window.DataContext>
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <TextBlock Text="Библиотека книг" FontSize="24" FontWeight="Bold" Margin="0,0,0,10"/>
+        
+        <Border Grid.Row="1" BorderBrush="#ccc" BorderThickness="1" Padding="10" Margin="0,0,0,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Label Content="Фильтр по автору:" Grid.Column="0" VerticalAlignment="Center"/>
+                <ComboBox Grid.Column="1" 
+                          ItemsSource="{Binding Authors}" 
+                          SelectedItem="{Binding SelectedAuthorFilter}"
+                          DisplayMemberPath="FullName"
+                          Margin="5,0,10,0"/>
+
+                <Label Content="Фильтр по жанру:" Grid.Column="2" VerticalAlignment="Center"/>
+                <ComboBox Grid.Column="3" 
+                          ItemsSource="{Binding Genres}" 
+                          SelectedItem="{Binding SelectedGenreFilter}"
+                          DisplayMemberPath="Name"
+                          Margin="5,0,10,0"/>
+
+                <Label Content="Поиск:" Grid.Column="4" VerticalAlignment="Center"/>
+                <TextBox Grid.Column="5" 
+                         Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="5,0,0,0"/>
+            </Grid>
+        </Border>
+        
+        <DataGrid Grid.Row="2" 
+                  ItemsSource="{Binding Books}"
+                  SelectedItem="{Binding SelectedBook}"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  Margin="0,0,0,10">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Название" Binding="{Binding Title}" Width="2*"/>
+                <DataGridTextColumn Header="Автор" Binding="{Binding Author.FullName}" Width="*"/>
+                <DataGridTextColumn Header="Жанр" Binding="{Binding Genre.Name}" Width="*"/>
+                <DataGridTextColumn Header="Год" Binding="{Binding PublishYear}" Width="80"/>
+                <DataGridTextColumn Header="ISBN" Binding="{Binding ISBN}" Width="120"/>
+                <DataGridTextColumn Header="В наличии" Binding="{Binding QuantityInStock}" Width="80"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="Управление авторами" 
+                    Command="{Binding ManageAuthorsCommand}"
+                    Margin="5"
+                    Padding="10,5"/>
+
+            <Button Content="Управление жанрами" 
+                    Command="{Binding ManageGenresCommand}"
+                    Margin="5"
+                    Padding="10,5"/>
+
+            <Button Content="Добавить книгу" 
+                    Command="{Binding AddBookCommand}"
+                    Margin="5"
+                    Padding="10,5"
+                    Background="#4CAF50" 
+                    Foreground="White"/>
+
+            <Button Content="Редактировать" 
+                    Command="{Binding EditBookCommand}"
+                    Margin="5"
+                    Padding="10,5"
+                    Background="#2196F3" 
+                    Foreground="White"/>
+
+            <Button Content="Удалить" 
+                    Command="{Binding DeleteBookCommand}"
+                    Margin="5"
+                    Padding="10,5"
+                    Background="#F44336" 
+                    Foreground="White"/>
+        </StackPanel>
+    </Grid>
+</Window>
