@@ -19,8 +19,8 @@ namespace LibraryManagement.Models
 
         [MaxLength(100)]
         public string? Country { get; set; }
-
-        public virtual ICollection<Book> Books { get; set; } = new HashSet<Book>();
+        
+        public virtual ICollection<BookAuthor> BookAuthors { get; set; } = new HashSet<BookAuthor>();
 
         public string FullName => $"{FirstName} {LastName}";
     }

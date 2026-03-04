@@ -49,7 +49,28 @@ namespace LibraryManagement.Views
         private void Save_Click(object sender, RoutedEventArgs e)
         {
             try
-            {
+            {                
+                var genresToCheck = _context.Genres.Local
+                    .Where(g => !string.IsNullOrWhiteSpace(g.Name))
+                    .ToList();
+
+                foreach (var genre in genresToCheck)
+                {                    
+                    bool isDuplicate = _context.Genres
+                        .Any(g => g.Id != genre.Id &&
+                                 g.Name.ToLower() == genre.Name.ToLower());
+
+                    if (isDuplicate)
+                    {
+                        MessageBox.Show($"Жанр '{genre.Name}' уже существует в базе данных.",
+                            "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        
+                        GenresGrid.SelectedItem = genre;
+                        GenresGrid.ScrollIntoView(genre);
+                        return;
+                    }
+                }
+
                 _context.SaveChanges();
                 DialogResult = true;
                 Close();

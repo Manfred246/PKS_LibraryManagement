@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace LibraryManagement.Models
 {
@@ -9,9 +11,6 @@ namespace LibraryManagement.Models
         [Required]
         [MaxLength(200)]
         public string Title { get; set; } = string.Empty;
-
-        [Required]
-        public int AuthorId { get; set; }
 
         [Required]
         public int GenreId { get; set; }
@@ -25,8 +24,29 @@ namespace LibraryManagement.Models
         [Required]
         [Range(0, int.MaxValue)]
         public int QuantityInStock { get; set; }
-        
-        public virtual Author? Author { get; set; }
+
         public virtual Genre? Genre { get; set; }
+
+        public virtual ICollection<BookAuthor> BookAuthors { get; set; } = new HashSet<BookAuthor>();
+        
+        public ICollection<Author> Authors
+        {
+            get
+            {
+                return BookAuthors?.Select(ba => ba.Author).Where(a => a != null).ToList() ?? new List<Author>();
+            }
+        }
+        
+        public string AuthorsDisplay
+        {
+            get
+            {
+                if (Authors != null && Authors.Any())
+                {
+                    return string.Join(", ", Authors.Select(a => a.FullName));
+                }
+                return "Нет авторов";
+            }
+        }
     }
 }

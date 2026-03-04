@@ -114,7 +114,6 @@ C:\Git\PKS_LibraryManagement\LibraryManagement\LibraryManagement\bin\Debug\net8.
 C:\Git\PKS_LibraryManagement\LibraryManagement\LibraryManagement\bin\Debug\net8.0-windows\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
 C:\Git\PKS_LibraryManagement\LibraryManagement\LibraryManagement\bin\Debug\net8.0-windows\runtimes\win\lib\netstandard2.0\System.Runtime.Caching.dll
 C:\Git\PKS_LibraryManagement\LibraryManagement\LibraryManagement\obj\Debug\net8.0-windows\LibraryManagement.csproj.AssemblyReference.cache
-C:\Git\PKS_LibraryManagement\LibraryManagement\LibraryManagement\obj\Debug\net8.0-windows\Styles\DatePickerStyles.baml
 C:\Git\PKS_LibraryManagement\LibraryManagement\LibraryManagement\obj\Debug\net8.0-windows\Views\AuthorsManagementView.baml
 C:\Git\PKS_LibraryManagement\LibraryManagement\LibraryManagement\obj\Debug\net8.0-windows\Views\BookDialogView.baml
 C:\Git\PKS_LibraryManagement\LibraryManagement\LibraryManagement\obj\Debug\net8.0-windows\Views\GenresManagementView.baml
@@ -138,3 +137,4 @@ C:\Git\PKS_LibraryManagement\LibraryManagement\LibraryManagement\obj\Debug\net8.
 C:\Git\PKS_LibraryManagement\LibraryManagement\LibraryManagement\obj\Debug\net8.0-windows\LibraryManagement.pdb
 C:\Git\PKS_LibraryManagement\LibraryManagement\LibraryManagement\obj\Debug\net8.0-windows\LibraryManagement.genruntimeconfig.cache
 C:\Git\PKS_LibraryManagement\LibraryManagement\LibraryManagement\obj\Debug\net8.0-windows\ref\LibraryManagement.dll
+C:\Git\PKS_LibraryManagement\LibraryManagement\LibraryManagement\obj\Debug\net8.0-windows\LibraryManagement.sourcelink.json

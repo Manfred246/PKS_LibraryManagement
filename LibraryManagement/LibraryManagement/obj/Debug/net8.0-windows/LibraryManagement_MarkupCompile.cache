@@ -10,11 +10,11 @@ none
 false
 TRACE;DEBUG;NET;NET8_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_OR_GREATER;NET7_0_OR_GREATER;NET8_0_OR_GREATER;NETCOREAPP3_0_OR_GREATER;NETCOREAPP3_1_OR_GREATER;WINDOWS7_0_OR_GREATER
 C:\Git\PKS_LibraryManagement\LibraryManagement\LibraryManagement\App.xaml
-5-2020856339
+4-1739341637
 
-12809392820
+15810096349
 226-1688350608
-Styles\DatePickerStyles.xaml;Views\AuthorsManagementView.xaml;Views\BookDialogView.xaml;Views\GenresManagementView.xaml;Views\MainWindow.xaml;
+Views\AuthorsManagementView.xaml;Views\BookDialogView.xaml;Views\GenresManagementView.xaml;Views\MainWindow.xaml;
 
 False
 

@@ -14,7 +14,7 @@ namespace LibraryManagement.Views
         private readonly LibraryContext _context;
 
         public Book Book { get; }
-        public ObservableCollection<Author> Authors { get; set; }
+        public ObservableCollection<AuthorViewModel> AvailableAuthors { get; set; }
         public ObservableCollection<Genre> Genres { get; set; }
 
         public BookDialogView(LibraryContext context, Book book)
@@ -22,16 +22,33 @@ namespace LibraryManagement.Views
             InitializeComponent();
             _context = context;
             Book = book;
-
-            _context.Authors.Load();
+            
             _context.Genres.Load();
+            _context.Authors.Load();
 
-            Authors = new ObservableCollection<Author>(_context.Authors.Local.ToObservableCollection());
             Genres = new ObservableCollection<Genre>(_context.Genres.Local.ToObservableCollection());
+            
+            var allAuthors = _context.Authors.Local.ToObservableCollection();
+            AvailableAuthors = new ObservableCollection<AuthorViewModel>();
+            
+            var selectedAuthorIds = new HashSet<int>();
+            if (Book.Id != 0 && Book.BookAuthors != null)
+            {
+                selectedAuthorIds = Book.BookAuthors.Select(ba => ba.AuthorId).ToHashSet();
+            }
+
+            foreach (var author in allAuthors)
+            {
+                AvailableAuthors.Add(new AuthorViewModel
+                {
+                    Id = author.Id,
+                    FullName = author.FullName,
+                    IsSelected = selectedAuthorIds.Contains(author.Id)
+                });
+            }
 
             if (Book.Id == 0)
             {
-                Book.Author = Authors.FirstOrDefault();
                 Book.Genre = Genres.FirstOrDefault();
             }
 
@@ -39,7 +56,7 @@ namespace LibraryManagement.Views
         }
 
         private void OkButton_Click(object sender, RoutedEventArgs e)
-        {
+        {            
             if (Book.PublishYear < 1000 || Book.PublishYear > DateTime.Now.Year + 1)
             {
                 MessageBox.Show($"Укажите корректный год издания (от 1000 до {DateTime.Now.Year + 1})",
@@ -53,9 +70,10 @@ namespace LibraryManagement.Views
                 return;
             }
 
-            if (Book.Author == null)
+            var selectedAuthors = AvailableAuthors.Where(a => a.IsSelected).ToList();
+            if (!selectedAuthors.Any())
             {
-                MessageBox.Show("Выберите автора", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Выберите хотя бы одного автора", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -65,22 +83,46 @@ namespace LibraryManagement.Views
                 return;
             }
 
-            Book.AuthorId = Book.Author.Id;
-            Book.GenreId = Book.Genre.Id;
-
             if (Book.QuantityInStock < 0)
             {
                 MessageBox.Show("Количество не может быть отрицательным", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
+            Book.GenreId = Book.Genre.Id;
+            
             if (Book.Id == 0)
+            {                
                 _context.Books.Add(Book);
+
+                foreach (var authorVm in selectedAuthors)
+                {
+                    _context.BookAuthors.Add(new BookAuthor
+                    {
+                        Book = Book,
+                        AuthorId = authorVm.Id
+                    });
+                }
+            }
+            else
+            {                
+                var existingLinks = _context.BookAuthors.Where(ba => ba.BookId == Book.Id);
+                _context.BookAuthors.RemoveRange(existingLinks);
+
+                foreach (var authorVm in selectedAuthors)
+                {
+                    _context.BookAuthors.Add(new BookAuthor
+                    {
+                        BookId = Book.Id,
+                        AuthorId = authorVm.Id
+                    });
+                }
+            }
 
             DialogResult = true;
             Close();
         }
-
+        
         private void PublishYear_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             if (!e.Text.All(char.IsDigit))
@@ -166,5 +208,12 @@ namespace LibraryManagement.Views
             DialogResult = false;
             Close();
         }
+    }
+
+    public class AuthorViewModel
+    {
+        public int Id { get; set; }
+        public string FullName { get; set; } = string.Empty;
+        public bool IsSelected { get; set; }
     }
 }

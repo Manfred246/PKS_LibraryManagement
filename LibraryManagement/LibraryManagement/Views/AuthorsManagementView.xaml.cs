@@ -30,8 +30,8 @@ namespace LibraryManagement.Views
         {
             var author = AuthorsGrid.SelectedItem as Author;
             if (author != null)
-            {
-                if (_context.Books.Any(b => b.AuthorId == author.Id))
+            {                
+                if (_context.BookAuthors.Any(ba => ba.AuthorId == author.Id))
                 {
                     MessageBox.Show("Нельзя удалить автора, у которого есть книги", "Ошибка",
                         MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -49,7 +49,31 @@ namespace LibraryManagement.Views
         private void Save_Click(object sender, RoutedEventArgs e)
         {
             try
-            {
+            {                
+                var authorsToCheck = _context.Authors.Local
+                    .Where(a => !string.IsNullOrWhiteSpace(a.FirstName) &&
+                               !string.IsNullOrWhiteSpace(a.LastName))
+                    .ToList();
+
+                foreach (var author in authorsToCheck)
+                {                    
+                    bool isDuplicate = _context.Authors
+                        .Any(a => a.Id != author.Id &&
+                                 a.FirstName.ToLower() == author.FirstName.ToLower() &&
+                                 a.LastName.ToLower() == author.LastName.ToLower() &&
+                                 a.BirthDate == author.BirthDate);
+
+                    if (isDuplicate)
+                    {
+                        MessageBox.Show($"Автор '{author.FullName}' с датой рождения {author.BirthDate:dd.MM.yyyy} уже существует в базе данных.",
+                            "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+
+                        AuthorsGrid.SelectedItem = author;
+                        AuthorsGrid.ScrollIntoView(author);
+                        return;
+                    }
+                }
+
                 _context.SaveChanges();
                 DialogResult = true;
                 Close();

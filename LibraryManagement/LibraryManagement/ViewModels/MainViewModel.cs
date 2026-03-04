@@ -39,27 +39,28 @@ namespace LibraryManagement.ViewModels
 
         private void LoadData()
         {
+            // Загружаем книги с авторами и жанрами
             _context.Books
-                .Include(b => b.Author)
                 .Include(b => b.Genre)
+                .Include(b => b.BookAuthors)
+                    .ThenInclude(ba => ba.Author)
                 .Load();
 
             _context.Authors.Load();
             _context.Genres.Load();
 
-            Books = _context.Books.Local.ToObservableCollection();
+            _books = _context.Books.Local.ToObservableCollection();
             Authors = _context.Authors.Local.ToObservableCollection();
             Genres = _context.Genres.Local.ToObservableCollection();
+
+            // Важно: вызываем обновление отображения
+            OnPropertyChanged(nameof(Books));
         }
 
         public ObservableCollection<Book>? Books
         {
             get => ApplyFilters();
-            set
-            {
-                _books = value;
-                OnPropertyChanged();
-            }
+            // Убираем сеттер, так как Books теперь вычисляемое свойство
         }
 
         public ObservableCollection<Author>? Authors
@@ -133,14 +134,15 @@ namespace LibraryManagement.ViewModels
             var filtered = _books.AsEnumerable();
 
             if (SelectedAuthorFilter != null)
-                filtered = filtered.Where(b => b.AuthorId == SelectedAuthorFilter.Id);
+                filtered = filtered.Where(b => b.Authors.Any(a => a.Id == SelectedAuthorFilter.Id));
 
             if (SelectedGenreFilter != null)
                 filtered = filtered.Where(b => b.GenreId == SelectedGenreFilter.Id);
 
             if (!string.IsNullOrWhiteSpace(SearchText))
                 filtered = filtered.Where(b =>
-                    b.Title.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
+                    b.Title.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                    b.Authors.Any(a => a.FullName.Contains(SearchText, StringComparison.OrdinalIgnoreCase)));
 
             return new ObservableCollection<Book>(filtered);
         }
@@ -157,6 +159,8 @@ namespace LibraryManagement.ViewModels
             if (dialog.ShowDialog() == true)
             {
                 _context.SaveChanges();
+                // Перезагружаем данные для обновления связей
+                LoadData();
                 OnPropertyChanged(nameof(Books));
             }
         }
@@ -169,6 +173,8 @@ namespace LibraryManagement.ViewModels
             if (dialog.ShowDialog() == true)
             {
                 _context.SaveChanges();
+                // Перезагружаем данные для обновления связей
+                LoadData();
                 OnPropertyChanged(nameof(Books));
             }
         }
@@ -182,8 +188,9 @@ namespace LibraryManagement.ViewModels
         {
             if (SelectedBook == null) return;
 
+            var authorNames = string.Join(", ", SelectedBook.Authors.Select(a => a.FullName));
             var result = System.Windows.MessageBox.Show(
-                $"Удалить книгу '{SelectedBook.Title}'?",
+                $"Удалить книгу '{SelectedBook.Title}' (авторы: {authorNames})?",
                 "Подтверждение удаления",
                 System.Windows.MessageBoxButton.YesNo,
                 System.Windows.MessageBoxImage.Question);
@@ -192,6 +199,7 @@ namespace LibraryManagement.ViewModels
             {
                 _context.Books.Remove(SelectedBook);
                 _context.SaveChanges();
+                LoadData();
                 OnPropertyChanged(nameof(Books));
             }
         }
@@ -200,47 +208,23 @@ namespace LibraryManagement.ViewModels
         {
             var dialog = new Views.AuthorsManagementView(_context);
             dialog.ShowDialog();
+            LoadData();
             OnPropertyChanged(nameof(Authors));
+            OnPropertyChanged(nameof(Books));
         }
 
         private void ManageGenres(object? parameter)
         {
             var dialog = new Views.GenresManagementView(_context);
             dialog.ShowDialog();
+            LoadData();
             OnPropertyChanged(nameof(Genres));
+            OnPropertyChanged(nameof(Books));
         }
 
         protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-    }
-    
-    public class RelayCommand : ICommand
-    {
-        private readonly Action<object?> _execute;
-        private readonly Func<object?, bool>? _canExecute;
-
-        public RelayCommand(Action<object?> execute, Func<object?, bool>? canExecute = null)
-        {
-            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
-            _canExecute = canExecute;
-        }
-
-        public event EventHandler? CanExecuteChanged
-        {
-            add { CommandManager.RequerySuggested += value; }
-            remove { CommandManager.RequerySuggested -= value; }
-        }
-
-        public bool CanExecute(object? parameter)
-        {
-            return _canExecute == null || _canExecute(parameter);
-        }
-
-        public void Execute(object? parameter)
-        {
-            _execute(parameter);
         }
     }
 }

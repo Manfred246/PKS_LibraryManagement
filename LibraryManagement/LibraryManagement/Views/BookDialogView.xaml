@@ -1,7 +1,7 @@
 ﻿<Window x:Class="LibraryManagement.Views.BookDialogView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Книга" Height="400" Width="500"
+        Title="Книга" Height="450" Width="550"
         WindowStartupLocation="CenterOwner"
         WindowStyle="ToolWindow">
 
@@ -13,8 +13,8 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
@@ -24,17 +24,28 @@
         <Label Grid.Row="0" Grid.Column="0" Content="Название:" Margin="5"/>
         <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Book.Title, UpdateSourceTrigger=PropertyChanged}" Margin="5" Height="25"/>
 
-        <Label Grid.Row="1" Grid.Column="0" Content="Автор:" Margin="5"/>
-        <ComboBox Grid.Row="1" Grid.Column="1" 
-                  Name="AuthorComboBox"
-                  ItemsSource="{Binding Authors}"
-                  SelectedItem="{Binding Book.Author, Mode=TwoWay}"
-                  DisplayMemberPath="FullName"
-                  Margin="5" Height="25"/>
+        <Label Grid.Row="1" Grid.Column="0" Content="Авторы:" Margin="5"/>
+        <StackPanel Grid.Row="1" Grid.Column="1" Margin="5">
+            <ListBox x:Name="AuthorsListBox" 
+                     ItemsSource="{Binding AvailableAuthors}"
+                     SelectionMode="Multiple"
+                     DisplayMemberPath="FullName"
+                     Height="100"
+                     Margin="0,0,0,5"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto">
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="IsSelected" Value="{Binding IsSelected}"/>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+            </ListBox>
+            <TextBlock Text="Удерживайте Ctrl для выбора нескольких авторов" 
+                       FontSize="10" 
+                       Foreground="Gray"/>
+        </StackPanel>
 
         <Label Grid.Row="2" Grid.Column="0" Content="Жанр:" Margin="5"/>
         <ComboBox Grid.Row="2" Grid.Column="1" 
-                  Name="GenreComboBox"
                   ItemsSource="{Binding Genres}"
                   SelectedItem="{Binding Book.Genre, Mode=TwoWay}"
                   DisplayMemberPath="Name"
@@ -42,7 +53,6 @@
 
         <Label Grid.Row="3" Grid.Column="0" Content="Год издания:" Margin="5"/>
         <TextBox Grid.Row="3" Grid.Column="1" 
-                 x:Name="YearTextBox"
                  Text="{Binding Book.PublishYear, UpdateSourceTrigger=PropertyChanged}" 
                  PreviewTextInput="PublishYear_PreviewTextInput"
                  PreviewKeyDown="PublishYear_PreviewKeyDown"
@@ -60,7 +70,7 @@
                  DataObject.Pasting="Quantity_Pasting"
                  Margin="5" Height="25"/>
 
-        <StackPanel Grid.Row="6" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="5">
+        <StackPanel Grid.Row="7" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="5">
             <Button Content="OK" Click="OkButton_Click" Margin="5" Padding="20,5" Background="#4CAF50" Foreground="White"/>
             <Button Content="Отмена" Click="CancelButton_Click" Margin="5" Padding="20,5" Background="#F44336" Foreground="White"/>
         </StackPanel>
